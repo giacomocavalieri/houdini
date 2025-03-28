@@ -120,13 +120,13 @@ fn do_escape(
 }
 
 @external(erlang, "houdini_ffi", "first")
-@external(javascript, "../houdini.ffi.mjs", "first")
+@external(javascript, "../../houdini.ffi.mjs", "first")
 fn first(string: String) -> String
 
 @external(erlang, "houdini_ffi", "drop_first")
-@external(javascript, "../houdini.ffi.mjs", "drop_first")
+@external(javascript, "../../houdini.ffi.mjs", "drop_first")
 fn drop_first(string: String) -> String
 
 @external(erlang, "houdini_ffi", "slice")
-@external(javascript, "../houdini.ffi.mjs", "slice")
+@external(javascript, "../../houdini.ffi.mjs", "slice")
 fn slice(string: String, from: Int, to: Int) -> String
