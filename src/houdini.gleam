@@ -1,17 +1,22 @@
 @target(javascript)
-import internals/escape_generic as escape
+import houdini/internals/escape_generic as escape
 
 @target(erlang)
-import internals/escape_erl as escape
+import houdini/internals/escape_erl as escape
 
-/// Escapes a string in a format suitable to be used inside HTML by escaping
-/// the following characters: `<`, `>`, `&`, `"`, `'`.
+/// Escapes a string to be safely used inside an HTML document by escaping
+/// the following characters:
+///   - `<` becomes `&lt;`
+///   - `>` becomes `&gt;`
+///   - `&` becomes `&amp;`
+///   - `"` becomes `&quot;`
+///   - `'` becomes `&#39;`.
 ///
 /// ## Examples
 ///
 /// ```gleam
-/// assert escape("wibble & wobble") == "wibble &amp; wobble";
-/// assert escape("wibble > wobble") == "wibble &gt; wobble";
+/// assert escape("wibble & wobble") == "wibble &amp; wobble"
+/// assert escape("wibble > wobble") == "wibble &gt; wobble"
 /// ```
 ///
 pub fn escape(string: String) -> String {
