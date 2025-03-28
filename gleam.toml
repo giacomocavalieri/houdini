@@ -4,8 +4,6 @@ description = "🪄 Fast HTML escaping"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "giacomocavalieri", repo = "houdini" }
 
-internal_modules = ["houdini/internals/*"]
-
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 

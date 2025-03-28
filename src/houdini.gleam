@@ -1,8 +1,8 @@
 @target(javascript)
-import houdini/internals/escape_generic as escape
+import houdini/internal/escape_generic as escape
 
 @target(erlang)
-import houdini/internals/escape_erl as escape
+import houdini/internal/escape_erl as escape
 
 /// Escapes a string to be safely used inside an HTML document by escaping
 /// the following characters:
