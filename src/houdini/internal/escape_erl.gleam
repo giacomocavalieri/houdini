@@ -1,19 +1,15 @@
 @target(erlang)
-import gleam/bit_array
-@target(erlang)
-import gleam/list
-
-@target(erlang)
 pub fn escape(text: String) -> String {
   // This version is highly optimised for the Erlang target, it treats Strings
   // as BitArrays and slices them to share as much as possible. You can find
   // more details in `do_escape`.
-  let bits = coerce(text)
+  let bits = <<text:utf8>>
 
-  do_escape(bits, 0, bits, [])
-  |> list.reverse
-  |> bit_array.concat
-  |> coerce
+  let result = do_escape(bits, 0, bits, <<>>)
+
+  // we know that the BitArray we build is definitely a valid string, so we can
+  // skip verifying that again as well as dealing with the `Result`.
+  coerce(result)
 }
 
 @target(erlang)
@@ -33,34 +29,34 @@ fn do_escape(
   bin: BitArray,
   skip: Int,
   original: BitArray,
-  acc: List(BitArray),
-) -> List(BitArray) {
+  acc: BitArray,
+) -> BitArray {
   case bin {
     // If we find a char to escape we just advance the `skip` counter so that
     // it will be ignored in the following slice, then we append the escaped
     // version to the accumulator.
     <<"<", rest:bits>> -> {
-      let acc = [<<"&lt;">>, ..acc]
+      let acc = <<acc:bits, "&lt;">>
       do_escape(rest, skip + 1, original, acc)
     }
 
     <<">", rest:bits>> -> {
-      let acc = [<<"&gt;">>, ..acc]
+      let acc = <<acc:bits, "&gt;">>
       do_escape(rest, skip + 1, original, acc)
     }
 
     <<"&", rest:bits>> -> {
-      let acc = [<<"&amp;">>, ..acc]
+      let acc = <<acc:bits, "&amp;">>
       do_escape(rest, skip + 1, original, acc)
     }
 
     <<"\"", rest:bits>> -> {
-      let acc = [<<"&quot;">>, ..acc]
+      let acc = <<acc:bits, "&quot;">>
       do_escape(rest, skip + 1, original, acc)
     }
 
     <<"'", rest:bits>> -> {
-      let acc = [<<"&#39;">>, ..acc]
+      let acc = <<acc:bits, "&#39;">>
       do_escape(rest, skip + 1, original, acc)
     }
 
@@ -79,9 +75,9 @@ fn do_escape_normal(
   bin: BitArray,
   skip: Int,
   original: BitArray,
-  acc: List(BitArray),
+  acc: BitArray,
   len: Int,
-) -> List(BitArray) {
+) -> BitArray {
   // Remember, if we're here it means we've found a char that doesn't need to be
   // escaped, so what we want to do is advance the `len` counter until we reach
   // a char that _does_ need to be escaped and take the slice going from
@@ -106,27 +102,27 @@ fn do_escape_normal(
     // possible: we only allocate a new BitArray for the escaped chars,
     // everything else is just a slice of the original String.
     <<"<", rest:bits>> -> {
-      let acc = [<<"&lt;">>, slice(original, skip, len), ..acc]
+      let acc = <<acc:bits, slice(original, skip, len):bits, "&lt;">>
       do_escape(rest, skip + len + 1, original, acc)
     }
 
     <<">", rest:bits>> -> {
-      let acc = [<<"&gt;">>, slice(original, skip, len), ..acc]
+      let acc = <<acc:bits, slice(original, skip, len):bits, "&gt;">>
       do_escape(rest, skip + len + 1, original, acc)
     }
 
     <<"&", rest:bits>> -> {
-      let acc = [<<"&amp;">>, slice(original, skip, len), ..acc]
+      let acc = <<acc:bits, slice(original, skip, len):bits, "&amp;">>
       do_escape(rest, skip + len + 1, original, acc)
     }
 
     <<"\"", rest:bits>> -> {
-      let acc = [<<"&quot;">>, slice(original, skip, len), ..acc]
+      let acc = <<acc:bits, slice(original, skip, len):bits, "&quot;">>
       do_escape(rest, skip + len + 1, original, acc)
     }
 
     <<"'", rest:bits>> -> {
-      let acc = [<<"&#39;">>, slice(original, skip, len), ..acc]
+      let acc = <<acc:bits, slice(original, skip, len):bits, "&#39;">>
       do_escape(rest, skip + len + 1, original, acc)
     }
 
@@ -139,8 +135,8 @@ fn do_escape_normal(
       // without finding a char that is not valid. This means that the entire
       // string doesn't need any escaping, we can just return it as is!
       case skip {
-        0 -> [original]
-        _ -> [slice(original, skip, len), ..acc]
+        0 -> original
+        _ -> <<acc:bits, slice(original, skip, len):bits>>
       }
 
     _ -> panic as "non byte aligned string, all strings should be byte aligned"
