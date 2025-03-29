@@ -7,11 +7,16 @@ import houdini
 import simplifile
 
 pub fn main() {
-  let files = read_project_files()
-  let label = int.to_string(string.byte_size(files) / 1024) <> "KB"
+  let html = read_project_files()
+  let bytes = string.byte_size(html)
+  let no_escapes = string.repeat("a", bytes)
+  let size = int.to_string(bytes / 1024) <> "KB"
 
   bench.run(
-    [bench.Input(label, files)],
+    [
+      bench.Input("just_html  (" <> size <> ")", html),
+      bench.Input("no_escapes (" <> size <> ")", no_escapes),
+    ],
     [bench.Function("houdini.escape", houdini.escape)],
     [bench.Duration(5000), bench.Warmup(2000)],
   )

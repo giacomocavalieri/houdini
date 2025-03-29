@@ -1,7 +1,18 @@
-export function slice(string, from, len) {
-  return string.slice(from, from + len);
-}
-
-export function drop_first(string) {
-  return string.slice(1);
+export function do_escape(string) {
+  return string.replaceAll(/[><&"']/g, (replaced) => {
+    switch (replaced) {
+      case ">":
+        return "&gt;";
+      case "<":
+        return "&lt;";
+      case "'":
+        return "&#39;";
+      case "&":
+        return "&amp;";
+      case '"':
+        return "&quot;";
+      default:
+        return replaced;
+    }
+  });
 }
