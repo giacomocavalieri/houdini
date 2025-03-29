@@ -26,33 +26,28 @@ fn do_escape(
   len: Int,
   found_normal: Bool,
 ) -> List(String) {
-  case found_normal, first(string) {
-    False, "<" -> {
-      let rest = drop_first(string)
+  case found_normal, string {
+    False, "<" <> rest -> {
       let acc = ["&lt;", ..acc]
       do_escape(rest, skip + 1, original, acc, 0, False)
     }
 
-    False, ">" -> {
-      let rest = drop_first(string)
+    False, ">" <> rest -> {
       let acc = ["&gt;", ..acc]
       do_escape(rest, skip + 1, original, acc, 0, False)
     }
 
-    False, "&" -> {
-      let rest = drop_first(string)
+    False, "&" <> rest -> {
       let acc = ["&amp;", ..acc]
       do_escape(rest, skip + 1, original, acc, 0, False)
     }
 
-    False, "\"" -> {
-      let rest = drop_first(string)
+    False, "\"" <> rest -> {
       let acc = ["&quot;", ..acc]
       do_escape(rest, skip + 1, original, acc, 0, False)
     }
 
-    False, "'" -> {
-      let rest = drop_first(string)
+    False, "'" <> rest -> {
       let acc = ["&#39;", ..acc]
       do_escape(rest, skip + 1, original, acc, 0, False)
     }
@@ -66,36 +61,31 @@ fn do_escape(
       do_escape(rest, skip, original, acc, 1, True)
     }
 
-    True, "<" -> {
-      let rest = drop_first(string)
+    True, "<" <> rest -> {
       let slice = slice(original, skip, len)
       let acc = ["&lt;", slice, ..acc]
       do_escape(rest, skip + len + 1, original, acc, 0, False)
     }
 
-    True, ">" -> {
-      let rest = drop_first(string)
+    True, ">" <> rest -> {
       let slice = slice(original, skip, len)
       let acc = ["&gt;", slice, ..acc]
       do_escape(rest, skip + len + 1, original, acc, 0, False)
     }
 
-    True, "&" -> {
-      let rest = drop_first(string)
+    True, "&" <> rest -> {
       let slice = slice(original, skip, len)
       let acc = ["&amp;", slice, ..acc]
       do_escape(rest, skip + len + 1, original, acc, 0, False)
     }
 
-    True, "\"" -> {
-      let rest = drop_first(string)
+    True, "\"" <> rest -> {
       let slice = slice(original, skip, len)
       let acc = ["&quot;", slice, ..acc]
       do_escape(rest, skip + len + 1, original, acc, 0, False)
     }
 
-    True, "'" -> {
-      let rest = drop_first(string)
+    True, "'" <> rest -> {
       let slice = slice(original, skip, len)
       let acc = ["&#39;", slice, ..acc]
       do_escape(rest, skip + len + 1, original, acc, 0, False)
@@ -104,10 +94,7 @@ fn do_escape(
     True, "" ->
       case skip {
         0 -> [original]
-        _ -> {
-          let slice = slice(original, skip, len)
-          [slice, ..acc]
-        }
+        _ -> [slice(original, skip, len), ..acc]
       }
 
     // If a char doesn't need escaping we keep increasing the length of the
@@ -118,10 +105,6 @@ fn do_escape(
     }
   }
 }
-
-@external(erlang, "houdini_ffi", "first")
-@external(javascript, "../../houdini.ffi.mjs", "first")
-fn first(string: String) -> String
 
 @external(erlang, "houdini_ffi", "drop_first")
 @external(javascript, "../../houdini.ffi.mjs", "drop_first")
