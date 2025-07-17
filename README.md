@@ -16,7 +16,7 @@ document:
 import houdini
 
 pub fn main() -> Nil {
-  let assert "wibble &amp; wobble" = houdini.escape("wibble & wobble")
-  let assert "wibble &gt; wobble" = houdini.escape("wibble > wobble")
+  assert houdini.escape("wibble & wobble") == "wibble &amp; wobble"
+  assert houdini.escape("wibble > wobble") == "wibble &gt; wobble"
 }
 ```
