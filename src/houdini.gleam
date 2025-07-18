@@ -13,22 +13,18 @@
 /// assert escape("wibble > wobble") == "wibble &gt; wobble"
 /// ```
 ///
-@external(javascript, "./houdini.ffi.mjs", "do_escape")
+@external(javascript, "./houdini.ffi.mjs", "escape")
 pub fn escape(string: String) -> String {
   // This version is highly optimised for the Erlang target, it treats Strings
   // as BitArrays and slices them to share as much as possible. You can find
   // more details in `do_escape`.
   let bits = <<string:utf8>>
-
   let result = do_escape(bits, 0, bits, <<>>)
 
   // we know that the BitArray we build is definitely a valid string, so we can
   // skip verifying that again as well as dealing with the `Result`.
-  coerce(result)
+  unsafe_bit_array_to_string(result)
 }
-
-@external(erlang, "houdini_ffi", "coerce")
-fn coerce(bit_array: a) -> b
 
 // A possible way to escape chars would be to split the string into graphemes,
 // traverse those one by one and accumulate them back into a string escaping
@@ -208,5 +204,12 @@ fn do_escape_normal(
   }
 }
 
+@external(erlang, "gleam@function", "identity")
+fn unsafe_bit_array_to_string(_bit_array: BitArray) -> String {
+  panic as "usafe_bit_array_to_string: this shouldn't be needed on the JavaScript target"
+}
+
 @external(erlang, "binary", "part")
-fn slice(bit_array: BitArray, from: Int, size: Int) -> BitArray
+fn slice(_bit_array: BitArray, _from: Int, _size: Int) -> BitArray {
+  panic as "slice: this shouldn't be needed on the JavaScript target"
+}

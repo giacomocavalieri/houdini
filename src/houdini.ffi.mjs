@@ -1,4 +1,4 @@
-export function do_escape(string) {
+export function escape(string) {
   return string.replaceAll(/[><&"']/g, (replaced) => {
     switch (replaced) {
       case ">":
