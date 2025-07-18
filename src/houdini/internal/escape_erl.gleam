@@ -66,7 +66,8 @@ fn do_escape(
 
     <<>> -> acc
 
-    _ -> panic as "non byte aligned string, all strings should be byte aligned"
+    _ ->
+      panic as "do_escape: non byte aligned string, all strings should be byte aligned"
   }
 }
 
@@ -126,8 +127,59 @@ fn do_escape_normal(
       do_escape(rest, skip + len + 1, original, acc)
     }
 
-    // If a byte doesn't need escaping we keep increasing the length of the
-    // slice we're going to take.
+    // Otherwise we know that the first byte doesn't need any escape. The easy
+    // thing to do would be to just advance by that one byte and keep going over
+    // over the string. As you might notice here we're doing something a bit
+    // more involved: we look at the following 7 bytes, and if none of those
+    // needs escaping, then we skip this whole chunk of bytes entirely.
+    //
+    // This doesn't change the behaviour of the program, but it can make it a
+    // whole load faster to go over the entire string. Especially if there's
+    // fewer characters that need escaping!
+    //
+    // This idea comes from the amazing talk "Engineering json - Achieving Top
+    // Performance on the BEAM" by Michał Muskala at Code BEAM Europe 2024:
+    // https://www.youtube.com/watch?v=Z0swkSXAPBE
+    <<_, b, c, d, e, f, g, h, rest:bits>>
+      if b != 34
+      && b != 38
+      && b != 39
+      && b != 60
+      && b != 62
+      && c != 34
+      && c != 38
+      && c != 39
+      && c != 60
+      && c != 62
+      && d != 34
+      && d != 38
+      && d != 39
+      && d != 60
+      && d != 62
+      && e != 34
+      && e != 38
+      && e != 39
+      && e != 60
+      && e != 62
+      && f != 34
+      && f != 38
+      && f != 39
+      && f != 60
+      && f != 62
+      && g != 34
+      && g != 38
+      && g != 39
+      && g != 60
+      && g != 62
+      && h != 34
+      && h != 38
+      && h != 39
+      && h != 60
+      && h != 62
+    -> do_escape_normal(rest, skip, original, acc, len + 8)
+
+    // However, if any of the following bytes needs escaping, we skip over just
+    // the first byte!
     <<_, rest:bits>> -> do_escape_normal(rest, skip, original, acc, len + 1)
 
     <<>> ->
@@ -139,7 +191,8 @@ fn do_escape_normal(
         _ -> <<acc:bits, slice(original, skip, len):bits>>
       }
 
-    _ -> panic as "non byte aligned string, all strings should be byte aligned"
+    _ ->
+      panic as "do_escape_normal: non byte aligned string, all strings should be byte aligned"
   }
 }
 
