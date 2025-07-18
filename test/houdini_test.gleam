@@ -1,7 +1,6 @@
 import gleam/list
 import gleam/string
 import gleeunit
-import gleeunit/should
 import houdini
 import qcheck.{type Generator}
 
@@ -19,12 +18,12 @@ const conversions = [
 
 pub fn simple_conversions_test() {
   use #(value, escaped) <- list.each(conversions)
-  houdini.escape(value) |> should.equal(escaped)
+  assert houdini.escape(value) == escaped
 }
 
 pub fn strange_unicode_string_test() {
   let input = ">a>'ࣉa>aa<a'>><\"aa&aࣉ>aࣉaaaa>ࣉa\"a'&a<<<&\"aaa\"&a>aa\">><'ࣉ\""
-  houdini.escape(input) |> should.equal(escaped(input))
+  assert houdini.escape(input) == escaped(input)
 }
 
 pub fn regular_string_is_left_unchanged_test() {
@@ -34,7 +33,7 @@ pub fn regular_string_is_left_unchanged_test() {
     ])
 
   use regular_string <- given(qcheck.string_from(codepoints))
-  houdini.escape(regular_string) |> should.equal(regular_string)
+  assert houdini.escape(regular_string) == regular_string
 }
 
 pub fn string_with_special_characters_is_escaped_test() {
@@ -44,8 +43,7 @@ pub fn string_with_special_characters_is_escaped_test() {
     ])
 
   use string <- given(qcheck.string_from(codepoints))
-  houdini.escape(string)
-  |> should.equal(escaped(string))
+  assert houdini.escape(string) == escaped(string)
 }
 
 // --- PROPERTY HELPERS --------------------------------------------------------
