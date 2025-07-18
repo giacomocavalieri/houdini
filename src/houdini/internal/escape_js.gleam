@@ -1,5 +1,4 @@
-import gleam/string
-
+@target(javascript)
 /// This `escape` function will work on all targets, beware that the version
 /// specifically optimised for Erlang will be _way faster_ than this one when
 /// running on the BEAM. That's why this fallback implementation is only ever
@@ -9,12 +8,6 @@ pub fn escape(text: String) -> String {
   do_escape(text)
 }
 
+@target(javascript)
 @external(javascript, "../../houdini.ffi.mjs", "do_escape")
-fn do_escape(text: String) -> String {
-  text
-  |> string.replace(">", "&gt;")
-  |> string.replace("<", "&lt;")
-  |> string.replace("&", "&amp;")
-  |> string.replace("'", "&#39;")
-  |> string.replace("\"", "&quot;")
-}
+fn do_escape(_text: String) -> String

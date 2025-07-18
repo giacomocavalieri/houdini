@@ -1,5 +1,5 @@
 @target(javascript)
-import houdini/internal/escape_generic as escape
+import houdini/internal/escape_js as escape
 
 @target(erlang)
 import houdini/internal/escape_erl as escape
