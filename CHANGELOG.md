@@ -5,6 +5,8 @@
 - Improved performance of escaping on the Erlang target: escaping can now be up
   to x2.5 faster when escaping strings with little carachters to escape, and up
   to x1.3 faster when escaping strings with many characters to escape.
+- Dropped the `gleam_stdlib` dependency. Houdini now doesn't have any
+  dependency!
 
 ## v1.1.0 - 2025/03/29
 
