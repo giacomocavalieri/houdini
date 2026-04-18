@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.2.1 - 2025/04/18
+
+- Updated the `gleam_stdlib` dev dependency constraint to allow v1.
+
 ## v1.2.0 - 2025/07/18
 
 - Improved performance of escaping on the Erlang target: escaping can now be up
